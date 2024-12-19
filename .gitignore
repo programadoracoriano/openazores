@@ -1,0 +1,19 @@
+# Editor files
+.vscode/
+
+# Python source and cache
+.venv
+__pycache__
+
+# Config files
+config.env
+
+# App "temp" files
+db
+logs
+media
+static
+coverage
+
+# Generated schema
+schema.yml
