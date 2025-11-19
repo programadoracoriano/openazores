@@ -13,5 +13,5 @@ urlpatterns: URLPatternsList = [
     path("login/refresh/", views.UserLoginRefreshView.as_view(), name="login-refresh"),
     path("logout/", views.UserLogoutView.as_view(), name="logout"),
     path("change_password/", views.UserChangePasswordView.as_view(), name="change-password"),
-    path("profile/", views.UserProfileView.as_view(), name="profile"),
+    path("profile/", views.RetrieveUpdateCreateUserProfileView.as_view(), name="profile"),
 ]
