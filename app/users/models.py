@@ -29,3 +29,15 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin, AbstractBaseMode
 
     def __str__(self) -> str:
         return f"User ({self.id}) {self.get_username()}"
+
+
+class UserProfile(AbstractBaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="User")
+    name = models.CharField(max_length=255, verbose_name="Name")
+    address = models.CharField(max_length=255, verbose_name="Address")
+    city = models.CharField(max_length=255, verbose_name="City")
+    country = models.CharField(max_length=255, verbose_name="Country")
+    phone_number = models.CharField(max_length=12, verbose_name="Phone Number")
+
+    def __str__(self) -> str:
+        return self.name

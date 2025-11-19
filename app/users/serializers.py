@@ -37,19 +37,9 @@ class UserChangePasswordSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer to handle user's details."""
 
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+
     class Meta:
-        model = models.User
-        # Because more fields can be included in the user, instead exclude all that we know we don't want
-        exclude = (
-            "id",
-            "created_at",
-            "updated_at",
-            "is_deleted",
-            "is_staff",
-            "is_active",
-            "is_superuser",
-            "password",
-            "last_login",
-            "groups",
-            "user_permissions",
-        )
+        model = models.UserProfile
+        fields = ("id", "user", "name", "address", "city", "country", "phone_number")
