@@ -13,7 +13,7 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin, AbstractBaseMode
     the `BaseAbstractModel`.
     """
 
-    username = models.CharField(unique=True, max_length=255)
+    email = models.CharField(unique=True, max_length=255)
 
     is_active = models.BooleanField(
         default=True, help_text="Designates the user as active.", verbose_name="active status"
@@ -22,7 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin, SoftDeleteMixin, AbstractBaseMode
         default=False, help_text="Designates this user as a staff member.", verbose_name="staff status"
     )
 
-    USERNAME_FIELD = "username"
+    USERNAME_FIELD = "email"
     objects = UserManager()
 
     class Meta(AbstractBaseModel.Meta): ...
