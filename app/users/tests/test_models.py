@@ -7,14 +7,14 @@ class TestUser(TestCase):
 
     def test_creation(self) -> None:
         """Test creating a User object."""
-        username = "_username"
+        email = "email@email.com"
         password = "_password"
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(email=email, password=password)
         self.assertTrue(user.check_password(password))
         self.assertEqual(f"User ({user.id}) {user.get_username()}", str(user))
 
     def test_creation_no_password(self) -> None:
         """Test creating a User with no password."""
-        username = "_username"
-        user = User.objects.create_user(username=username)
+        email = "email@email.com"
+        user = User.objects.create_user(email=email)
         self.assertFalse(user.has_usable_password())
