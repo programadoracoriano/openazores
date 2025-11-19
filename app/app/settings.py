@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # Our apps here
     "core",
     "users",
+    "islands",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
