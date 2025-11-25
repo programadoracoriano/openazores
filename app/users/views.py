@@ -2,14 +2,15 @@ from typing import Any
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
 from rest_framework import generics, status
-from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied, NotFound
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from drf_spectacular.utils import OpenApiResponse, extend_schema, extend_schema_view
 from rest_framework_simplejwt import views as jwt_views
-from users import serializers
+from users import models, serializers
 from users.view_mixins import TargetAuthenticatedUserMixin
 
 
@@ -115,10 +116,6 @@ class UserWhoamiView(TargetAuthenticatedUserMixin, generics.RetrieveAPIView):
         summary="Patch user details", description="Endpoint to fully override the current user's details."
     ),
 )
-class UserProfileView(TargetAuthenticatedUserMixin, generics.RetrieveUpdateAPIView):
-    """Endpoint to retrieve and update a user's details."""
-
-    serializer_class = serializers.UserProfileSerializer
 
 
 @extend_schema(tags=["Users"])
@@ -181,3 +178,17 @@ class UserChangePasswordView(TargetAuthenticatedUserMixin, generics.UpdateAPIVie
         user.set_password(new_password)
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RetrieveUpdateCreateUserProfileView(generics.CreateAPIView, generics.RetrieveUpdateAPIView):
+    serializer_class = serializers.UserProfileSerializer
+
+    def get_queryset(self) -> QuerySet[models.UserProfile]:
+        assert isinstance(self.request.user, models.User)
+        return models.UserProfile.objects.filter(user=self.request.user)
+
+    def get_object(self) -> Any | None:
+        profile = self.get_queryset().first()
+        if not profile:
+            raise NotFound("Profile Not Found")
+        return profile

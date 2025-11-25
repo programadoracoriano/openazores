@@ -27,13 +27,13 @@ def sample_user(
 
     To set an empty password, set `allow_empty_password` as True.
     """
-    username = username or uuid()
+    email = "email@email.com"
     if not password and not allow_empty_password:
         password = VALID_PASSWORD
     return User.objects.create_user(
         **clear_Nones(
             id=id,
-            username=username,
+            email=email,
             password=password,
             is_staff=is_staff,
             is_superuser=is_superuser,

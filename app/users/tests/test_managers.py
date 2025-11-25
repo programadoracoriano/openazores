@@ -1,6 +1,5 @@
 from unittest import skipIf
 from django.test import TestCase
-from extensions.utilities import uuid
 from users.managers import UserManager
 from users.models import User
 from users.tests import VALID_PASSWORD
@@ -15,10 +14,10 @@ class TestUserManager(TestCase):
 
     def test_create_user(self) -> None:
         """Test creating a normal user."""
-        username = uuid()
+        email = "email@email.com"
         password = VALID_PASSWORD
-        user = User.objects.create_user(username=username, password=password)
-        self.assertEqual(username, user.username)
+        user = User.objects.create_user(email=email, password=password)
+        self.assertEqual(email, user.email)
         self.assertNotEqual(password, user.password)
         self.assertTrue(user.check_password(password))
         self.assertFalse(user.is_staff)
@@ -26,10 +25,10 @@ class TestUserManager(TestCase):
 
     def test_create_superuser(self) -> None:
         """Test creating a superuser."""
-        username = uuid()
+        email = "email@email.com"
         password = VALID_PASSWORD
-        user = User.objects.create_superuser(username=username, password=password)
-        self.assertEqual(username, user.username)
+        user = User.objects.create_superuser(email=email, password=password)
+        self.assertEqual(email, user.email)
         self.assertNotEqual(password, user.password)
         self.assertTrue(user.check_password(password))
         self.assertTrue(user.is_staff)
@@ -37,10 +36,10 @@ class TestUserManager(TestCase):
 
     def test_create_superuser_forces_staff(self) -> None:
         """Test creating a superuser forces the user to be staff."""
-        username = uuid()
+        email = "email@email.com"
         password = VALID_PASSWORD
-        user = User.objects.create_superuser(username=username, password=password, is_staff=False, is_superuser=False)
-        self.assertEqual(username, user.username)
+        user = User.objects.create_superuser(email=email, password=password, is_staff=False, is_superuser=False)
+        self.assertEqual(email, user.email)
         self.assertNotEqual(password, user.password)
         self.assertTrue(user.check_password(password))
         self.assertTrue(user.is_staff)
