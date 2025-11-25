@@ -2,11 +2,11 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 
-django-rest-framework-boilerplate
+# Open Azores Project
+## Founder: Gualter Perinho
 ===
-This repository contains a boilerplate implementation of a Django Rest Framework + Postgres stack, with extended functionality and utilities.
-
-Provided by [PedroPerpetua](https://github.com/PedroPerpetua).
+This project is a open source software made to display Azores islands places, food and some other useful information.
+If you want to use this project to comercial duties, feel free and contact openacores@gmail.com
 
 
 ## Version
