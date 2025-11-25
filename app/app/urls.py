@@ -7,6 +7,7 @@ from extensions.utilities.types import URLPatternsList
 urlpatterns: URLPatternsList = [
     path("", include("core.urls")),
     path("api/users/", include("users.urls")),
+    path("api/islands/", include("islands.urls")),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
     *static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),
 ]
