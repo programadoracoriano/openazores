@@ -1,7 +1,5 @@
 
-import { Authenticator } from "remix-auth";
-import { FormStrategy } from "remix-auth-form";
-import { createCookieSessionStorage } from "react-router";
+import { createCookieSessionStorage, redirect } from "react-router";
 import z from 'zod';
 import bcrypt from 'bcryptjs';
 import prisma from "~/lib/prisma";
@@ -25,10 +23,33 @@ export const sessionStorage = createCookieSessionStorage({
 	},
 });
 
+export async function createUserSession(userId: string, redirectTo: string) {
+  const session = await sessionStorage.getSession();
+  session.set("userId", userId);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await sessionStorage.commitSession(session),
+    },
+  });
+}
 
-export const authenticator = new Authenticator<User>();
+export async function getUserId(request: Request) {
+  const session = await sessionStorage.getSession(request.headers.get("Cookie"));
+  const userId = session.get("userId");
+  if (!userId) return null;
+  return userId;
+}
 
-async function login(email: string, password: string): Promise<User> {
+export async function logout(request: Request) {
+  const session = await sessionStorage.getSession(request.headers.get("Cookie"));
+  return redirect("/login", {
+    headers: {
+      "Set-Cookie": await sessionStorage.destroySession(session),
+    },
+  });
+}
+
+export async function login(email: string, password: string): Promise<User> {
     const db = prisma;
 
     const payloadSchema = z.object({
@@ -37,7 +58,6 @@ async function login(email: string, password: string): Promise<User> {
     });
 
     const result = payloadSchema.safeParse({ email, password });
-    console.log(result)
     if (!result.success) throw new Error("Dados inválidos");
 
     const user = await db.user.findUnique({ where: { email } });
@@ -55,17 +75,3 @@ async function login(email: string, password: string): Promise<User> {
         name: user.name ?? "",
     };
 }
-
-authenticator.use(
-	new FormStrategy(async ({ form }) => {
-		const email = form.get("email") as string;
-		const password = form.get("password") as string;
-
-		if (!email || !password) {
-			throw new Error("Email and password are required");
-		}
-
-		return await login(email, password);
-	}),
-	"user-pass",
-);

@@ -1,30 +1,18 @@
 import { Form, useActionData, useNavigation, data, redirect } from "react-router";
-import { authenticator, sessionStorage } from "~/services/auth.server";
+import { login, createUserSession, getUserId } from "../../../auth.server";
 import type { Route } from "./+types/signin";
 
 export async function action({ request }: Route.ActionArgs) {
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
     try {
-		let user = await authenticator.authenticate("user-pass", request);
-		let session = await sessionStorage.getSession(
-			request.headers.get("cookie"),
-		);
-
-		session.set("user", user);
-
-		return redirect("/user/dashboard", {
-			headers: {
-				"Set-Cookie": await sessionStorage.commitSession(session),
-			},
-		});
-	} catch (error) {
-		// Return validation errors or authentication errors
-		if (error instanceof Error) {
-			return data({ error: error.message });
-		}
-
-		// Re-throw any other errors (including redirects)
-		throw error;
-	}
+      const user = await login(email, password);
+      return createUserSession(user.id, "/user/dashboard");
+    } catch (error: any) {
+      return data({ error: error.message }, { status: 400 })
+    }
 }
 
 export default function SigninPage() {
@@ -79,11 +67,10 @@ export default function SigninPage() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-	let session = await sessionStorage.getSession(request.headers.get("cookie"));
-	let user = session.get("user");
+	const userId = await getUserId(request);
+  console.log("userId", userId)
 
 	// If the user is already authenticated redirect to the dashboard
-	if (user) return redirect("/dashboard");
 
 	// Otherwise return null to render the login page
 	return data(null);
