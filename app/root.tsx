@@ -16,7 +16,6 @@ import "./app.css";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const locale = getLocaleFromPath(request.url);
-
   if (!locale) {
     throw data("Language not supported", { status: 404 });
   }
