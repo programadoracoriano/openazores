@@ -1,35 +1,26 @@
 import SignupForm from '~/components/auth/SignupForm';
 import { data, redirect } from "react-router";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
+import { getIntlayer } from "intlayer";
 import type { Route } from "./+types/signup";
-import prisma from "~/lib/prisma";
+import { UserCreateSchema } from '~/schemas/UserSchema';
+import { createUser, getUserByEmail } from '~/models/UserModel';
 
 
-export async function action({ request }: Route.ActionArgs) {
-    const db = prisma;
+export function meta({ params }: Route.MetaArgs) {
+  const content = getIntlayer("page", params.locale);
+  return [
+    {title: content.signup.title}
+  ]
+
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+
+  const t = getIntlayer("page", params.locale);
   const formData = await request.formData();
   const submission = Object.fromEntries(formData);
-  const payloadSchema = z
-      .object({
-          name: z
-          .string()
-          .min(2, "O nome deve ter pelo menos 2 caracteres")
-          .max(50, "O nome é muito longo"),
-          email: z
-          .string()
-          .email("Formato de email inválido"),
-          password: z
-          .string()
-          .min(8, "A senha deve ter pelo menos 8 caracteres"),
-          confirmPassword: z
-          .string()
-          .min(1, "A confirmação de senha é obrigatória"),
-      })
-      .refine((data) => data.password === data.confirmPassword, {
-          message: "As senhas não coincidem",
-          path: ["confirmPassword"],
-      });
+
+  const payloadSchema = UserCreateSchema(t)
   const result = payloadSchema.safeParse(submission);
 
   if (!result.success) {
@@ -39,9 +30,10 @@ export async function action({ request }: Route.ActionArgs) {
     );
   }
 
-  const { email, password, name } = result.data;
+  const { email } = result.data;
 
-  const userExists = await db.user.findUnique({ where: { email } });
+  const userExists = await getUserByEmail(email);
+
   if (userExists) {
     return data(
       { errors: { email: ["Este email já está registado."] } },
@@ -50,19 +42,11 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
 
   try {
-    await db.user.create({
-      data: {
-        email,
-        name,
-        password: hashedPassword,
-      },
-    });
+    createUser(result.data)
 
-    return redirect("/login");
+    return redirect("/signin");
   } catch (error) {
     return data(
       { errors: { form: "Erro ao criar conta. Tente novamente." } },

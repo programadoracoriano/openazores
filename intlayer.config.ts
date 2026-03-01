@@ -5,6 +5,9 @@ const config: IntlayerConfig = {
     locales: [Locales.ENGLISH, Locales.PORTUGUESE],
     defaultLocale: Locales.ENGLISH,
   },
+  content: {
+    contentDir: ['./app'],
+  },
 };
 
 export default config;
